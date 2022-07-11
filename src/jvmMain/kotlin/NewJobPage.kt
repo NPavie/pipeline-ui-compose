@@ -11,6 +11,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.TrayState
+import androidx.compose.ui.window.rememberNotification
 import org.daisy.pipeline.ui.bridge.Script
 import org.daisy.pipeline.ui.bridge.ScriptField
 
@@ -87,14 +89,14 @@ fun ScriptSpinner(
  */
 @Composable
 @Preview
-fun NewJobPage(){
-
+fun NewJobPage(trayState: TrayState){
+    val notification = rememberNotification("New job", "Launching a new job")
     val scriptList = listOf(Script.MockDaisy3ToEpub3());
     var fieldsAnswer = mutableMapOf<ScriptField, String>()
     MaterialTheme {
         var aScriptIsSelected by remember { mutableStateOf(false) }
         var selectedScript by remember { mutableStateOf(scriptList[0]) }
-        var text by remember { mutableStateOf("Hello, Test!") }
+        var text by remember { mutableStateOf("Launch a job") }
         Column {
             Row (Modifier.padding(5.dp)) {
                 ScriptSpinner(
@@ -131,8 +133,10 @@ fun NewJobPage(){
             }
             Row {
                 Button(
+                    enabled = aScriptIsSelected,
                     onClick = {
-                        text = "Launch a job"
+                        text = "Job launched"
+                        trayState.sendNotification(notification)
                     },
                 ) {
                     Text(text)

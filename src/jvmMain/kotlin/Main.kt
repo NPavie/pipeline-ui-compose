@@ -44,12 +44,12 @@ fun main() = application {
                     isOpen = true
                 }
             )
-            /*Item(
+            Item(
                 "Send notification",
                 onClick = {
                     trayState.sendNotification(notification)
                 }
-            )*/
+            )
             Item(
                 "Exit",
                 onClick = {
@@ -67,13 +67,14 @@ fun main() = application {
                 // To remove to work as a background app
                 exitApplication()
             },
-            icon = MyAppIcon
+            icon = MyAppIcon,
+            title = "Daisy pipeline 2 - compose prototype"
         ) {
             var focusManager = LocalFocusManager.current
 
             var routes = mutableMapOf<String, @Composable () -> Unit>()
             routes["newJob"] = {
-                NewJobPage()
+                NewJobPage(trayState)
                 focusManager.moveFocus(FocusDirection.Right)
             }
             routes["status"] = {
