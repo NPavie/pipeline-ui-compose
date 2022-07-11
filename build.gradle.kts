@@ -119,22 +119,6 @@ compose.desktop {
                 "jdk.unsupported.desktop",
                 "jdk.xml.dom",
                 "jdk.zipfs")
-            /*modules(
-                "java.base",
-                "java.desktop",
-                "java.xml",
-                "java.compiler",
-                "java.instrument",
-                "java.management",
-                "java.naming",
-                "java.rmi",
-                "java.security.jgss",
-                "java.sql",
-                "jdk.management.agent",
-                "jdk.zipfs",
-                "jdk.httpserver",
-                "jdk.unsupported"
-            )*/
             packageName = "pipeline-ui-compose"
             packageVersion = "1.0.0"
         }
