@@ -6,8 +6,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.semantics.text
+import androidx.compose.ui.semantics.*
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import org.daisy.pipeline.ui.bridge.ScriptField
@@ -19,7 +18,9 @@ fun ParameterView(
     field:ScriptField,
     onValueChange:(value:String) -> (Unit) = {}
 ) {
+
     var answer by remember { mutableStateOf(field.defaultValue.toString()) }
+
     Column {
         Text(field.name)
         Row(
@@ -37,9 +38,12 @@ fun ParameterView(
                         onValueChange.invoke(it.toString().lowercase())
                     },
                     modifier = Modifier.semantics() {
-                        text = AnnotatedString(field.niceName +
-                                (if (answer.lowercase() == "true") " option is enabled" else " option is disabled" )
-                                + ". Click here to change it.")
+                        contentDescription = "${field.niceName} switch," + (
+                                if (answer.lowercase() == "true")
+                                    " option is enabled"
+                                else " option is disabled"
+                                ) +
+                                ". Click here to change it."
                     }
                 )
                 ScriptField.DataType.DIRECTORY,
@@ -52,8 +56,7 @@ fun ParameterView(
                             onValueChange.invoke(it.toString())
                         },
                         modifier = Modifier.semantics() {
-                            text = AnnotatedString("Enter a value for " + field.niceName
-                                    + " or select a value with the next button")
+                            contentDescription = "${field.niceName} Input : enter a value here or select a value with the next button"
                         }
                     )
                     Button(
@@ -83,6 +86,9 @@ fun ParameterView(
                     onValueChange = {
                         answer = it.toString()
                         onValueChange.invoke(it.toString())
+                    },
+                    modifier = Modifier.semantics() {
+                        contentDescription = field.niceName + " input"
                     }
                 )
             }

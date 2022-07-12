@@ -10,6 +10,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.rememberNotification
@@ -28,33 +30,32 @@ fun ScriptSpinner(
 
     Box {
         Column (Modifier.padding(5.dp), Arrangement.SpaceBetween) {
-            /*Text(
-                label,
-                fontWeight = FontWeight.Bold
-            )*/
-
-            Row (Modifier.clickable { expanded = !expanded }){ // Anchor view
+            Row (
+                Modifier.clickable { expanded = !expanded }.then(
+                    Modifier.semantics() {
+                        contentDescription = "Select a script to run"
+                    }
+                )
+            ){ // Anchor view
                 Text(text = if(hasSelection) selected.name else label) // City name label
                 Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "open list")
             }
-            /*OutlinedTextField(
-                value = (selected.name),
-                onValueChange = { },
-                label = { Text(label) },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = false,
-                trailingIcon = { Icon(Icons.Outlined.ArrowDropDown, null) },
-                readOnly = true
-            )*/
-
             DropdownMenu(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().then(
+                    Modifier.semantics {
+                        contentDescription = "List of scripts available"
+                    }
+                ),
                 expanded = expanded,
                 onDismissRequest = { expanded = false },
             ) {
                 list.forEach { entry ->
                     DropdownMenuItem(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier.fillMaxWidth().then(
+                            Modifier.semantics {
+                                contentDescription = "${entry.name} script"
+                            }
+                        ),
                             onClick = {
                                 selected = entry
                                 expanded = false
