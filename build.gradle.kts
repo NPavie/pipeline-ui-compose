@@ -117,7 +117,7 @@ compose.desktop {
                 "jdk.xml.dom",
                 "jdk.zipfs")
             packageName = "pipeline-ui-compose"
-            packageVersion = "1.0.0"
+            packageVersion = "1.0.1"
         }
 
     }

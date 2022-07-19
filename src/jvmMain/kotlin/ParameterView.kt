@@ -1,3 +1,4 @@
+
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -5,8 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Button
+import androidx.compose.material.Checkbox
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -71,7 +72,7 @@ fun ParameterView(
         Text(field.niceName)
         // Create the input matching the parameter type
         when (field.dataType) {
-            ScriptField.DataType.BOOLEAN -> Switch(
+            ScriptField.DataType.BOOLEAN -> Checkbox(
                 checked = answer.lowercase() == "true",
                 onCheckedChange = null,
                 /*modifier = Modifier.semantics() {
