@@ -1,5 +1,3 @@
-
-
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -8,13 +6,12 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 
@@ -25,9 +22,7 @@ fun main() = application {
 
     var currentRoute by remember { mutableStateOf("newJob") }
 
-
     // Launch pipeline service
-
     // pass the service registries to rendering functions
     // simplified routing within the app :
     //
@@ -61,6 +56,7 @@ fun main() = application {
     )
     // Managed window
     if(isOpen){
+        var newJobFocusRequester = remember { FocusRequester() }
         Window(
             onCloseRequest = {
                 isOpen = false
@@ -70,20 +66,18 @@ fun main() = application {
             icon = MyAppIcon,
             title = "Daisy pipeline 2 - compose prototype"
         ) {
-            var focusManager = LocalFocusManager.current
-
             var routes = mutableMapOf<String, @Composable () -> Unit>()
             routes["newJob"] = {
-                NewJobPage(trayState)
-                focusManager.moveFocus(FocusDirection.Right)
+                NewJobPage(trayState, newJobFocusRequester)
+                //focusManager.moveFocus(FocusDirection.Right)
             }
             routes["status"] = {
                 PipelinePage()
-                focusManager.moveFocus(FocusDirection.Right)
+                //focusManager.moveFocus(FocusDirection.Right)
             }
             routes["job"] = {
                 JobPage()
-                focusManager.moveFocus(FocusDirection.Right)
+                //focusManager.moveFocus(FocusDirection.Right)
             }
 
             // content
@@ -101,6 +95,9 @@ fun main() = application {
                         Column( Modifier.width(200.dp)) {
                             Button(
                                 onClick = {
+                                    if(currentRoute == "newJob"){
+                                        newJobFocusRequester.requestFocus()
+                                    }
                                     currentRoute = "newJob"
                                 },
                                 Modifier.fillMaxWidth()
@@ -118,7 +115,6 @@ fun main() = application {
                             Button(
                                 onClick = {
                                     currentRoute = "status"
-
                                 },
                                 Modifier.fillMaxWidth()
                             ) {
@@ -133,7 +129,6 @@ fun main() = application {
                     }
                 }
             }
-
         }
     }
 }
