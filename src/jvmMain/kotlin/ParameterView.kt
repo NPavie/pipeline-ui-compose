@@ -1,5 +1,4 @@
 
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +20,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import org.daisy.pipeline.ui.bridge.ScriptField
 import javax.swing.JFileChooser
@@ -39,7 +40,6 @@ fun ParameterView(
     // TODO for better accesible switch/checkbox, make the row clickable
 
     Row(
-
         Modifier.padding(5.dp)
             .then(Modifier.fillMaxWidth())
             .then(
@@ -60,7 +60,9 @@ fun ParameterView(
                     } else false
                 }) else Modifier
             ).then(
-                Modifier.focusable().then(
+                Modifier.semantics {
+                    this.text = AnnotatedString(field.niceName)
+                }.then(
                     if(focusRequester != null)
                         Modifier.focusRequester(focusRequester)
                     else Modifier
@@ -74,34 +76,10 @@ fun ParameterView(
         when (field.dataType) {
             ScriptField.DataType.BOOLEAN -> Checkbox(
                 checked = answer.lowercase() == "true",
-                onCheckedChange = null,
-                /*modifier = Modifier.semantics() {
-                    contentDescription = "${field.niceName} switch," + (
-                            if (answer.lowercase() == "true")
-                                " option is enabled"
-                            else " option is disabled"
-                            ) +
-                            ". Click here to change it."
-                }*/
+                onCheckedChange = null
             )
             ScriptField.DataType.DIRECTORY,
             ScriptField.DataType.FILE -> {
-
-                OutlinedTextField(
-                    value = answer.toString(),
-                    singleLine = true,
-                    label = {
-                        Text(field.name)
-                    },
-                    onValueChange = {
-                        answer = it.toString()
-                        onValueChange.invoke(it.toString())
-                    },
-                    modifier = Modifier.semantics() {
-                        contentDescription =
-                            "${field.niceName} Input : enter a value here or select a value with the next button"
-                    }
-                )
                 Button(
                     onClick = {
                         val jfc = JFileChooser()
@@ -123,6 +101,17 @@ fun ParameterView(
                         else "Select a file"
                     )
                 }
+                OutlinedTextField(
+                    value = answer.toString(),
+                    singleLine = true,
+                    label = {
+                        Text(field.name)
+                    },
+                    onValueChange = {
+                        answer = it.toString()
+                        onValueChange.invoke(it.toString())
+                    },
+                )
             }
             else -> OutlinedTextField(
                 value = answer.toString(),

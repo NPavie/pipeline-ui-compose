@@ -1,3 +1,4 @@
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -8,21 +9,26 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color.Companion.Green
 import androidx.compose.ui.graphics.Color.Companion.LightGray
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.TrayState
 import androidx.compose.ui.window.rememberNotification
 import org.daisy.pipeline.ui.bridge.Script
 import org.daisy.pipeline.ui.bridge.ScriptField
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ScriptSelector(
     label: String,
@@ -47,13 +53,24 @@ fun ScriptSelector(
                     onClickLabel = label
                 ) {
                     expanded = !expanded
+                }.then(Modifier.focusable().focusRequester(focusRequester)).semantics {
+                      this.text = AnnotatedString(if (hasSelection) selected.name + " script selected" else label)
                 }.then(
-                    Modifier.padding(5.dp)
-                ).then(Modifier.focusable().focusRequester(focusRequester)),
+                    Modifier.onPreviewKeyEvent {
+                        if (it.type == KeyEventType.KeyDown && it.key == Key.Tab) {
+                            if (it.isShiftPressed) {
+                                focusManager.moveFocus(FocusDirection.Up)
+                            } else focusManager.moveFocus(FocusDirection.Down)
+                            true
+                        } else {
+                            false
+                        }
+                    }
+                ),
                 Arrangement.spacedBy(5.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) { // Anchor view
-                if (hasSelection) Text(text = selected.name)
+
                 Button(
                     onClick = {
                         expanded = !expanded
@@ -61,6 +78,8 @@ fun ScriptSelector(
                 ) {
                     Text(label)
                 }
+                if (hasSelection) Text(text = selected.name)
+
             }
 
             if (expanded) {
@@ -77,7 +96,7 @@ fun ScriptSelector(
                                 modifier = Modifier.fillMaxWidth()
                                     .then(
                                         Modifier.semantics {
-                                            contentDescription = "${list[index].name} script"
+                                            text = AnnotatedString("${list[index].name} script")
                                         }
                                     ).then(
                                         Modifier.focusRequester(
@@ -120,7 +139,7 @@ fun ScriptSelector(
  */
 @Composable
 @Preview
-fun NewJobPage(trayState: TrayState, scriptSelectorFocusRequester: FocusRequester) {
+fun NewJobPage(trayState: TrayState, pageFocusRequester: FocusRequester) {
     val notification = rememberNotification("New job", "Launching a new job")
     val scriptList = listOf(Script.MockDaisy3ToEpub3());
     var fieldsAnswer = mutableMapOf<ScriptField, String>()
@@ -129,14 +148,13 @@ fun NewJobPage(trayState: TrayState, scriptSelectorFocusRequester: FocusRequeste
         var aScriptIsSelected by remember { mutableStateOf(false) }
         var selectedScript by remember { mutableStateOf(scriptList[0]) }
         var text by remember { mutableStateOf("Launch a job") }
-        Column {
+        Column (
+            Modifier.semantics {
+                this.text = AnnotatedString("New job panel")
+            }
+        ) {
             Row(
                 Modifier.padding(5.dp)
-                /*.then(
-                    Modifier.focusable()
-                ).then(
-                    Modifier.focusRequester(focusRequester)
-                )*/
             ) {
                 ScriptSelector(
                     "Select a script",
@@ -157,7 +175,7 @@ fun NewJobPage(trayState: TrayState, scriptSelectorFocusRequester: FocusRequeste
                         aScriptIsSelected = true
                         //scriptSelectorFocusRequester.requestFocus()
                     },
-                    focusRequester = scriptSelectorFocusRequester
+                    focusRequester = pageFocusRequester
                 )
             }
             Column(
@@ -201,7 +219,7 @@ fun NewJobPage(trayState: TrayState, scriptSelectorFocusRequester: FocusRequeste
             }
         }
         LaunchedEffect(Unit) {
-            scriptSelectorFocusRequester.requestFocus()
+            pageFocusRequester.requestFocus()
         }
     }
 

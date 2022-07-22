@@ -1,4 +1,4 @@
-import androidx.compose.foundation.focusable
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.MaterialTheme
@@ -12,6 +12,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 
@@ -56,7 +60,10 @@ fun main() = application {
     )
     // Managed window
     if(isOpen){
-        var newJobFocusRequester = remember { FocusRequester() }
+        var newJobPageFocusRequester = remember { FocusRequester() }
+        var pipelinePageFocusRequester = remember { FocusRequester() }
+        var jobPageFocusRequester = remember { FocusRequester() }
+
         Window(
             onCloseRequest = {
                 isOpen = false
@@ -67,24 +74,23 @@ fun main() = application {
             title = "Daisy pipeline 2 - compose prototype"
         ) {
             var routes = mutableMapOf<String, @Composable () -> Unit>()
+            var panelNames = mutableMapOf<String,String>()
+
             routes["newJob"] = {
-                NewJobPage(trayState, newJobFocusRequester)
-                //focusManager.moveFocus(FocusDirection.Right)
+                NewJobPage(trayState, newJobPageFocusRequester)
             }
             routes["status"] = {
-                PipelinePage()
-                //focusManager.moveFocus(FocusDirection.Right)
+                PipelinePage(pipelinePageFocusRequester)
             }
+
             routes["job"] = {
-                JobPage()
-                //focusManager.moveFocus(FocusDirection.Right)
+                JobPage(jobPageFocusRequester)
             }
 
             // content
             MaterialTheme {
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize()
                 ) {
                     Row(
                         Modifier.padding(5.dp)
@@ -92,17 +98,21 @@ fun main() = application {
                             .then(Modifier.align(Alignment.TopStart)),
                         Arrangement.spacedBy(5.dp)
                     )  {
-                        Column( Modifier.width(200.dp)) {
+                        Column(
+                            Modifier.width(100.dp).semantics {
+                                text = AnnotatedString("Navigation bar")
+                            }
+                        ) {
                             Button(
                                 onClick = {
                                     if(currentRoute == "newJob"){
-                                        newJobFocusRequester.requestFocus()
+                                        newJobPageFocusRequester.requestFocus()
                                     }
                                     currentRoute = "newJob"
                                 },
                                 Modifier.fillMaxWidth()
                             ) {
-                                Text("+ New job")
+                                Text("New job", textAlign = TextAlign.Center)
                             }
                             Button(
                                 onClick = {
@@ -110,7 +120,7 @@ fun main() = application {
                                 },
                                 Modifier.fillMaxWidth()
                             ) {
-                                Text("Jobs")
+                                Text("Jobs", textAlign = TextAlign.Center)
                             }
                             Button(
                                 onClick = {
@@ -118,14 +128,10 @@ fun main() = application {
                                 },
                                 Modifier.fillMaxWidth()
                             ) {
-                                Text("Service status")
+                                Text("Service status", textAlign = TextAlign.Center)
                             }
                         }
-                        Column {
-                            Box(Modifier.focusable()){
-                                if(routes.keys.contains(currentRoute)) routes[currentRoute]?.invoke()
-                            }
-                        }
+                        if(routes.keys.contains(currentRoute)) routes[currentRoute]?.invoke()
                     }
                 }
             }

@@ -1,11 +1,16 @@
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.material.MaterialTheme
+import androidx.compose.foundation.layout.Column
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.text
+import androidx.compose.ui.text.AnnotatedString
 
 /**
  * page that displays and control the pipeline that should run as a background service
@@ -15,12 +20,17 @@ import androidx.compose.ui.Modifier
  */
 @Composable
 @Preview
-fun JobPage(){
-    Box(Modifier.focusable()){
-        MaterialTheme {
-            Text("Job page to be designed")
+fun JobPage(pageFocusRequester: FocusRequester){
+    Column (
+        Modifier.semantics {
+            this.text = AnnotatedString("Jobs panel")
         }
+    ) {
+        Text("Jobs page to be designed if", Modifier.focusable().focusRequester(pageFocusRequester))
     }
 
+    LaunchedEffect(Unit){
+        pageFocusRequester.requestFocus()
+    }
 
 }
